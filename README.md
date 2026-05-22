@@ -14,31 +14,27 @@ AVDCT-Net shifts the heavy computational reconstructive load to the Fog gateway 
 ```mermaid
 graph TD
     %% Edge Gateway Section
-    subgraph Edge Gateway [Edge Gateway - Resource Constrained]
-        Input[Raw EEG Signal] --> SharedLinear[Trainable Shared Linear Layer]
-        SharedLinear --> DCTMat[Discrete Cosine Transform]
-        DCTMat --> Subbands[Multi-Subband Sparsification]
-        Subbands --> Conv1x1[1x1 Conv1D Layer]
-        Conv1x1 --> Quant[Low-Bit Quantization]
-        Quant --> HybridCoding[Hybrid Coding & Zstandard Level 22]
+    subgraph EdgeGateway ["Edge Gateway - Resource Constrained"]
+        Input["Raw EEG Signal"] --> SharedLinear["Trainable Shared Linear Layer"]
+        SharedLinear --> DCTMat["Discrete Cosine Transform"]
+        DCTMat --> Subbands["Multi-Subband Sparsification"]
+        Subbands --> Conv1x1["1x1 Conv1D Layer"]
+        Conv1x1 --> Quant["Low-Bit Quantization"]
+        Quant --> HybridCoding["Hybrid Coding & Zstandard Level 22"]
     end
 
     %% Transmission
-    HybridCoding -->|Compressed Payload| Network([Wireless Channel])
+    HybridCoding -->|Compressed Payload| Network(["Wireless Channel"])
 
     %% Fog Gateway Section
-    subgraph Fog Gateway [Fog Gateway - High Performance]
-        Network --> ZstdDecompress[Zstd Decompression & Dequantization]
-        ZstdDecompress --> IntraInter[Intra/Inter-Channel Predictor]
-        IntraInter --> MHA[Multi-Head Self-Attention]
-        MHA --> IDCTMat[Inverse DCT]
-        IDCTMat --> FinalLinear[Trainable Final Linear Layer]
-        FinalLinear --> Output[Reconstructed EEG]
+    subgraph FogGateway ["Fog Gateway - High Performance"]
+        Network --> ZstdDecompress["Zstd Decompression & Dequantization"]
+        ZstdDecompress --> IntraInter["Intra/Inter-Channel Predictor"]
+        IntraInter --> MHA["Multi-Head Self-Attention"]
+        MHA --> IDCTMat["Inverse DCT"]
+        IDCTMat --> FinalLinear["Trainable Final Linear Layer"]
+        FinalLinear --> Output["Reconstructed EEG"]
     end
-
-    style EdgeGateway fill:#f9f9f9,stroke:#1B4F72,stroke-width:2px;
-    style FogGateway fill:#f9f9f9,stroke:#78281F,stroke-width:2px;
-    style Network fill:#eaeded,stroke:#7f8c8d,stroke-dasharray: 5 5;
 ```
 
 ---
